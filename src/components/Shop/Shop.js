@@ -5,7 +5,8 @@ import { useState } from 'react';
 import Product from '../Product/Product';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import Cart from '../Cart/Cart.js'
-import { addToDb } from '../../utilities/fakedb';
+import { addToDb, getStoredCart } from '../../utilities/fakedb';
+import { useEffect } from 'react';
 
 const Shop = () => {
     // console.log(fakeData);
@@ -13,20 +14,29 @@ const Shop = () => {
     const [products, setProducts] = useState(first10);
     const [cart,setCart] = useState([])
 
+    useEffect(()=>{
+        const savedCart = getStoredCart();
+        const productIds = Object.keys(savedCart);
+        const previousCart = productIds.map(existingId => {
+            const product = fakeData.find(pd => pd.id === existingId);
+            product.quantity = savedCart[existingId];
+            return product;
+        })
+        setCart(previousCart)
+    },[])
+
     const addCartHandler = (product) =>{
         const sameProduct = cart.find(pd =>pd.id === product.id);
-
         let count = 1;
         let newCart;
         if(sameProduct){
            count = sameProduct.quantity + 1;
            sameProduct.quantity = count;
-            const others = cart.filter(pd =>pd.id ===product.id);
-            newCart = [...others, sameProduct]
-
+           const others = cart.filter(pd =>pd.id === product.id);
+           newCart = [...others, sameProduct]
         }
         else{
-            product.quantity =1;
+            product.quantity = 1;
             newCart = [...cart,product];
         }
         setCart(newCart);
