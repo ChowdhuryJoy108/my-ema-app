@@ -1,14 +1,26 @@
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
-import { deleteFromDb, getStoredCart } from "../../utilities/fakedb";
+import { deleteFromDb, getStoredCart, clearTheCart } from "../../utilities/fakedb";
 import fakeData from "../../fakeData/products.json";
 import ReviewDetails from "../ReviewDetails/ReviewDetails";
 import Cart from "../Cart/Cart";
 import "../Review/Review.css";
+import happyImg from "../../images/giphy.gif"
+
 const Review = () => {
   const [cart, setCart] = useState([]);
+  const [orderPlaced, setOrderPlaced] = useState(false);
 
+  const handlePlaceOrder = () =>{
+    setCart([]);
+    setOrderPlaced(true);
+    clearTheCart();
+  }
+  let thankYou;
+  if(orderPlaced){
+    thankYou = <img src={happyImg} alt="" />
+  }
   const removeFromCartHandler = (productId) => {
     const newCart = cart.filter((pd) => pd.id !== productId);
     setCart(newCart);
@@ -37,13 +49,18 @@ const Review = () => {
             />
           </div>
         ))}
+
+        {
+          thankYou
+        }
       </div>
 
       <div className="cart-container">
-        <Cart cart={cart} />
+        <Cart cart={cart}>
+          <button onClick={handlePlaceOrder}>Place Order</button>
+        </Cart>
       </div>
     </div>
   );
 };
-
 export default Review;
